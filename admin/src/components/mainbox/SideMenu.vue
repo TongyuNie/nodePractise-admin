@@ -14,7 +14,7 @@
           <el-icon><avatar /></el-icon>
           <span>个人中心</span>
         </el-menu-item>
-        <el-sub-menu index="/user-manage">
+        <el-sub-menu index="/user-manage" v-admin>
           <template #title>
             <el-icon><user-filled /></el-icon>
             <span>用户管理</span>
@@ -59,7 +59,19 @@
 import {HomeFilled, Avatar, UserFilled, MessageBox, Reading, Pointer} from "@element-plus/icons-vue"
 import {useRoute} from "vue-router"
 const route = useRoute()
+import {useStore} from "vuex"
+const store = useStore()
 console.log("lll", route)
+
+const vAdmin = {
+  mounted(el){
+    console.log("eeeel", el)
+    // 权限管理-视图控制，路由仍能访问相关页面
+    if(store.state.userInfo.role !== 1){
+      el.parentNode.removeChild(el)
+    }
+  }
+}
 </script>
 
 <style scoped lang="scss">

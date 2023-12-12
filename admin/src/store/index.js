@@ -5,6 +5,7 @@ export default createStore({
   state: {
     isGetterRouter: false,
     isCollapsed: true,
+    userInfo: {}
   },
   getters: {
   },
@@ -14,6 +15,15 @@ export default createStore({
     },
     changeCollapsed(state){
       state.isCollapsed = !state.isCollapsed
+    },
+    changeUserInfo(state, value){
+      state.userInfo = {
+        ...state.userInfo,
+        ...value
+      }
+    },
+    clearUserInfo(state){
+      state.userInfo = {}
     }
   },
   actions: {
@@ -21,6 +31,6 @@ export default createStore({
   modules: {
   },
   plugins: [createPersistedState({
-    paths: ["isCollapsed"] 
+    paths: ["isCollapsed", "userInfo"] 
   })]
 })

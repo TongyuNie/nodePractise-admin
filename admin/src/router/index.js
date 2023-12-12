@@ -41,6 +41,7 @@ router.beforeEach((to, from, next) => {
     } else {
       if(!store.state.isGetterRouter){
         //  还未配置过路由，这是第一次
+        router.removeRoute('mainbox') // 解决管理员-编辑用户列表还能访问bug
         ConfigRouter()
         next({
           path: to.fullPath
@@ -55,11 +56,25 @@ router.beforeEach((to, from, next) => {
 
   // next()
 });
+const checkPermission =(item)=>{
+  if(item.requireAdmin){
+    return store.state.userInfo.role === 1
+  }
+  return true
+}
+
 const ConfigRouter = () => {
+  if(!router.hasRoute("mainbox")){
+    router.addRoute({
+      path: "/mainbox",
+      name: "mainbox",
+      component: MainBox,
+    })
+  }
   routesConfig.forEach((item) => {
-    router.addRoute("mainbox", item);
+    checkPermission(item) && router.addRoute("mainbox", item);
   });
   store.commit("changeGetterRouter", true)
 }
-// ConfigRouter ()
+
 export default router;

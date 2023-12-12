@@ -44,11 +44,12 @@
 import { loadFull } from "tsparticles";
 import { reactive, ref } from 'vue'
 import {useRouter} from 'vue-router'
+import axios from "axios"
+import { ElMessage } from 'element-plus'
+import {useStore} from 'vuex'
 // import type { FormInstance, FormRules } from 'element-plus'
 
-const handloLogin = () => {
-  localStorage.setItem("token", "niiiiit");
-};
+const store = useStore()
 const particlesInit = async (engine) => {
   //await loadFull(engine);
   await loadFull(engine);
@@ -72,9 +73,17 @@ const submitForm = () => {
   loginRef.value.validate(valid => {
     console.log("vvvv",valid)
     if(valid){
-      console.log(loginForm)
-      localStorage.setItem("token", "niiiiiit")
-      router.push("/index")
+      axios.post("/adminapi/user/login", loginForm).then(res =>{
+        console.log("登录返回信息",res.data)
+        if(res.data.ActionType == 'OK'){
+          store.commit("changeUserInfo",res.data.data )
+          store.commit("changeGetterRouter", false)
+          router.push("/index")
+        }else{
+          ElMessage.error('用户名密码不匹配')
+        }
+      })
+      // router.push("/index")
     }
   })
   // if () return
