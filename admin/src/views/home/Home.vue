@@ -21,9 +21,12 @@
         <span>公司产品</span>
       </div>
     </template>
-   <el-carousel :interval="4000" type="card" height="200px">
-    <el-carousel-item v-for="item in 6" :key="item">
-      <h3 text="2xl" justify="center">{{ item }}</h3>
+   <el-carousel :interval="4000" type="card" height="200px" v-if="loopList.length">
+    <el-carousel-item v-for="item in loopList" :key="item._id">
+      <div :style="{backgroundImage: `url(http://localhost:3000${item.cover})`, backgroundSize:'cover'}">
+        <h3 text="2xl" justify="center">{{ item.title }}</h3>
+      </div>
+      
     </el-carousel-item>
   </el-carousel>
   </el-card>
@@ -38,10 +41,12 @@
 //   console.log("ttttres", res.data)
 // })
 import {useStore} from 'vuex'
-import {computed} from 'vue'
-
+import {computed, onMounted, ref} from 'vue'
+import axios from 'axios'
 const store = useStore()
 console.log("home-store", store.state)
+
+const loopList = ref([])
 const avatarURL = computed(()=>{
   return store.state.userInfo.avatar? "http://localhost:3000"+store.state.userInfo.avatar:"https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
 })
@@ -49,6 +54,15 @@ const welcomeTxt = computed(()=>{
   return new Date().getHours()<12? '要开心啊':'休息休息吧'
    
 })
+onMounted(()=>{
+  getTableData()
+})
+const getTableData =async ()=> {
+  const res = await axios.get("/adminapi/news/list")
+  
+  loopList.value = res.data.data
+  console.log("新闻列表", loopList)
+}
 
 </script>
 <style scoped lang="scss">
@@ -56,7 +70,7 @@ const welcomeTxt = computed(()=>{
   margin-top: 50px;
 }
 .el-carousel__item h3 {
-  color: #475669;
+  color: #000;
   opacity: 0.75;
   line-height: 200px;
   margin: 0;
