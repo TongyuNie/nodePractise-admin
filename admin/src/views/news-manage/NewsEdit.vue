@@ -1,8 +1,8 @@
 <template>
   <div>
-    <el-page-header :icon="null" title="新闻管理">
+    <el-page-header @back="handleBack" title="新闻管理">
       <template #content>
-        <span class="text-large font-600 mr-3"> 创建新闻 </span>
+        <span class="text-large font-600 mr-3"> 编辑新闻 </span>
       </template>
     </el-page-header>
     <el-form
@@ -17,7 +17,7 @@
         <el-input v-model="newsForm.title" />
       </el-form-item>
       <el-form-item label="内容" prop="content">
-       <MyEditor @event="handleChange"></MyEditor>
+       <MyEditor @event="handleChange" :content="newsForm.content" v-if="newsForm.content"></MyEditor>
       </el-form-item>
       <el-form-item label="分类" prop="categrey">
         <el-select v-model="newsForm.categrey" class="m-2" style="width: 100%">
@@ -40,13 +40,15 @@
 </template>
 
 <script setup>
-import { ref, reactive} from 'vue'
+import { ref, reactive, onMounted} from 'vue'
 import MyEditor from '@/components/editor/Editor.vue'
 import Uploadd from "@/components/upload/Upload.vue"
 import upload from "@/util/upload.js";
-import {useRouter } from 'vue-router'
+import {useRouter, useRoute } from 'vue-router'
+import axios from 'axios';
 
 const router = useRouter()
+const route = useRoute()
 const newsFormRef = ref()
 const newsForm = reactive({
   title: "",
@@ -88,12 +90,21 @@ const changeCover = (file) => {
 const submitForm = ()=>{
   newsFormRef.value.validate(async (valid)=>{
     if(valid){
-      console.log("submit", newsForm)
-      await upload("/adminapi/news/add", newsForm)
-      // router.push("/news-manage/newslist")
+      console.log("submittt", newsForm)
+      await upload("/adminapi/news/list", newsForm)
+      router.back()
     }
   })
 }
+const handleBack = ()=>{
+  router.back()
+}
+onMounted(async ()=>{
+  console.log("rrroute", route.params.id)
+  const res = await axios.get(`/adminapi/news/list/${route.params.id}`)
+  Object.assign(newsForm, res.data.data[0])
+  console.log(res.data.data[0])
+})
 </script>
 
 <style lang="scss" scoped>
